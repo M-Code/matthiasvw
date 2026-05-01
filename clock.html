@@ -54,7 +54,7 @@
     }
     #hand-minute {
       transform-origin: 100px 100px;
-      /* Minute hand doesn't animate between whole-hour questions */
+      transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
     }
 
     /* Answer reveal */
@@ -184,25 +184,33 @@
 
   // ── Clock logic ─────────────────────────────────────────────────────────────
   const handHour   = document.getElementById('hand-hour');
+  const handMinute = document.getElementById('hand-minute');
   const answerEl   = document.getElementById('answer');
   const hintEl     = document.getElementById('hint');
 
-  let currentHour = 0; // 1–12
+  let current = { hour: 0, minute: 0 }; // minute: 0 or 30
   let state = 'question'; // 'question' | 'answer'
 
-  function pickHour() {
-    // Avoid repeating same hour
-    let h;
-    do { h = Math.floor(Math.random() * 12) + 1; } while (h === currentHour);
-    return h;
+  function pickTime() {
+    // Avoid repeating exact same time
+    let h, m;
+    do {
+      h = Math.floor(Math.random() * 12) + 1;
+      m = Math.random() < 0.5 ? 0 : 30;
+    } while (h === current.hour && m === current.minute);
+    return { hour: h, minute: m };
   }
 
   function showQuestion() {
-    currentHour = pickHour();
+    current = pickTime();
 
-    // Hour hand: 30° per hour, 12 → 0°, 3 → 90°, etc.
-    const deg = (currentHour % 12) * 30;
-    handHour.style.transform = `rotate(${deg}deg)`;
+    // Hour hand: 30° per hour + 15° extra for :30
+    const hourDeg = (current.hour % 12) * 30 + (current.minute === 30 ? 15 : 0);
+    handHour.style.transform = `rotate(${hourDeg}deg)`;
+
+    // Minute hand: 0° for :00, 180° for :30
+    const minDeg = current.minute === 30 ? 180 : 0;
+    handMinute.style.transform = `rotate(${minDeg}deg)`;
 
     answerEl.classList.remove('visible');
     hintEl.textContent = 'tap to see the time';
@@ -210,7 +218,8 @@
   }
 
   function showAnswer() {
-    answerEl.textContent = `${currentHour}:00`;
+    const m = current.minute === 0 ? '00' : '30';
+    answerEl.textContent = `${current.hour}:${m}`;
     answerEl.classList.add('visible');
     hintEl.textContent = 'tap for next';
     state = 'answer';
