@@ -82,11 +82,71 @@
       text-transform: uppercase;
       font-weight: 500;
     }
+
+    /* Toggle */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .toggle-label {
+      font-size: clamp(0.7rem, 3.5vw, 0.85rem);
+      color: #666;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .toggle {
+      position: relative;
+      width: 44px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: #2a2a3a;
+      border-radius: 999px;
+      transition: background 0.25s;
+      cursor: pointer;
+    }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #555;
+      transition: transform 0.25s, background 0.25s;
+    }
+    .toggle input:checked + .toggle-track {
+      background: #1a3a2a;
+    }
+    .toggle input:checked + .toggle-track::after {
+      transform: translateX(18px);
+      background: #44cc88;
+    }
   </style>
 </head>
 <body>
 
 <div class="container">
+
+  <div class="toggle-row">
+    <span class="toggle-label">:30 times</span>
+    <label class="toggle">
+      <input type="checkbox" id="half-toggle">
+      <div class="toggle-track"></div>
+    </label>
+  </div>
 
   <div class="clock-wrap">
     <svg class="clock-face" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -190,12 +250,17 @@
   let current = { hour: 0, minute: 0 }; // minute: 0 or 30
   let state = 'question'; // 'question' | 'answer'
 
+  const halfToggle = document.getElementById('half-toggle');
+
+  // Tapping the toggle should not also flip the flashcard
+  halfToggle.addEventListener('click', e => e.stopPropagation());
+
   function pickTime() {
-    // Avoid repeating exact same time
+    const includeHalf = halfToggle.checked;
     let h, m;
     do {
       h = Math.floor(Math.random() * 12) + 1;
-      m = Math.random() < 0.5 ? 0 : 30;
+      m = includeHalf && Math.random() < 0.5 ? 30 : 0;
     } while (h === current.hour && m === current.minute);
     return { hour: h, minute: m };
   }
