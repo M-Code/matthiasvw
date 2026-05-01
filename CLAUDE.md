@@ -1,19 +1,8 @@
 # Project Instructions
 
 ## About This Project
-<!-- Describe what the app does in 2-3 sentences -->
 
-## Tech Stack
-<!-- e.g. Node.js, Express, vanilla JS, SQLite -->
-
-## Folder Structure
-<!-- Brief overview of key folders -->
-
-## Conventions
-<!-- Coding style, naming conventions, patterns to follow -->
-
-## How to Run
-<!-- Dev server, build, deploy commands -->
+A home for all apps and info specific to Matthias
 
 ---
 
